@@ -3,7 +3,6 @@ import { Layout, Menu } from 'antd';
 import {
 	UserOutlined,
 	VideoCameraOutlined,
-	UploadOutlined,
 } from '@ant-design/icons';
 import {
 	BrowserRouter as Router,

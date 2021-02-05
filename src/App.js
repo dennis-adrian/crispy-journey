@@ -1,11 +1,12 @@
 import React from 'react';
+import { SocketProvider } from './context/SocketContext';
 import RouterPage from './pages/RouterPage';
 
 const App = () => {
 	return (
-		<div>
+		<SocketProvider>
 			<RouterPage />
-		</div>
+		</SocketProvider>
 	);
 };
 

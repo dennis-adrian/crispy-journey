@@ -1,5 +1,6 @@
-import React, { createRef } from 'react';
+import React, { createRef, useContext, useEffect, useState } from 'react';
 import { Form, Input, Button, Select, Typography } from 'antd';
+import { SocketContext } from '../context/SocketContext';
 const { Option } = Select;
 const layout = {
 	labelCol: {
@@ -16,22 +17,36 @@ const tailLayout = {
 	},
 };
 
-const {Title} = Typography;
+const { Title } = Typography;
 
 const Player = () => {
+	const { socket } = useContext(SocketContext);
+	const [task, setTask] = useState('');
+
+	useEffect(() => {
+		socket.on('task-added', taskReceived => {
+			setTask(taskReceived);
+		});
+	}, [socket]);
+
 	const formRef = createRef();
-	const onVoteChange = value => {
-		console.log(value);
-	};
+	// const onVoteChange = value => {
+	// 	console.log(value);
+	// };
 	const onFinish = values => {
-		console.log(values);
+		socket.emit('add-vote', values);
 	};
+	
 	const onReset = () => {
 		formRef.current.resetFields();
 	};
 	return (
-        <Form {...layout} ref={formRef} name='control-ref' onFinish={onFinish}>
-            <Title>There is no task assigned right now</Title>
+		<Form {...layout} ref={formRef} name='control-ref' onFinish={onFinish}>
+			{task.trim().length > 0 ? (
+				<Title>{task}</Title>
+			) : (
+				<Title>There is no task assigned right now</Title>
+			)}
 			<Form.Item
 				name='player'
 				label='Name'
@@ -51,8 +66,8 @@ const Player = () => {
 					},
 				]}>
 				<Select
-					placeholder='Select a option to vote'
-					onChange={onVoteChange}
+					placeholder='Select an option to vote'
+					// onChange={onVoteChange}
 					allowClear>
 					<Option value='1'>1</Option>
 					<Option value='2'>2</Option>

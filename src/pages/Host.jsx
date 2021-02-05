@@ -1,5 +1,7 @@
-import React, { createRef } from 'react';
-import { Form, Input, Button, Typography, Table } from 'antd';
+import React, { createRef, useContext, useEffect, useState } from 'react';
+import { Form, Input, Button, Typography, Table, Divider } from 'antd';
+import { SocketContext } from '../context/SocketContext';
+import ResultsTable from '../organisms/ResultsTable';
 const layout = {
 	labelCol: {
 		span: 4,
@@ -17,43 +19,26 @@ const tailLayout = {
 
 const { Title } = Typography;
 
-const dataSource = [
-	{
-		key: '1',
-		name: 'Carlos Vaca Perez',
-		vote: 2,
-	},
-	{
-		key: '2',
-		name: 'John',
-		vote: 5,
-	},
-];
-
-const columns = [
-	{
-		title: 'Name',
-		dataIndex: 'name',
-		key: 'name',
-	},
-	{
-		title: 'Votes',
-		dataIndex: 'vote',
-		key: 'vote',
-	},
-];
-
 const Host = () => {
+	const { socket } = useContext(SocketContext);
+	const [newTask, setNewTask] = useState('');
+
 	const formRef = createRef();
-	const onFinish = values => {
-		console.log(values);
+	const onFinish = value => {
+		socket.emit('add-task', value, addedTask => {
+			setNewTask(addedTask);
+		});
 	};
 	const onReset = () => {
 		formRef.current.resetFields();
 	};
+
 	const onShowResults = () => {
-		console.log('show results');
+		socket.on('vote-added', data => {
+			console.log(data);
+		});
 	};
+
 	return (
 		<>
 			<Form
@@ -61,7 +46,7 @@ const Host = () => {
 				ref={formRef}
 				name='control-ref'
 				onFinish={onFinish}>
-				<Title>This will show the task you input</Title>
+				<Title>Scrum Poker</Title>
 				<Form.Item
 					name='task'
 					label='Task'
@@ -72,26 +57,7 @@ const Host = () => {
 					]}>
 					<Input autoComplete='off' />
 				</Form.Item>
-				<Form.Item
-					noStyle
-					shouldUpdate={(prevValues, currentValues) =>
-						prevValues.gender !== currentValues.gender
-					}>
-					{({ getFieldValue }) => {
-						return getFieldValue('gender') === 'other' ? (
-							<Form.Item
-								name='customizeGender'
-								label='Customize Gender'
-								rules={[
-									{
-										required: true,
-									},
-								]}>
-								<Input />
-							</Form.Item>
-						) : null;
-					}}
-				</Form.Item>
+
 				<Form.Item {...tailLayout}>
 					<Button type='primary' htmlType='submit'>
 						Submit
@@ -107,7 +73,8 @@ const Host = () => {
 					</Button>
 				</Form.Item>
 			</Form>
-			<Table dataSource={dataSource} columns={columns} />
+			<Divider />
+			<ResultsTable />
 		</>
 	);
 };
