@@ -1,7 +1,12 @@
 import React from 'react';
+import RouterPage from './pages/RouterPage';
 
 const App = () => {
-	return <div>App Page</div>;
+	return (
+		<div>
+			<RouterPage />
+		</div>
+	);
 };
 
 export default App;
